@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0f6e56">
+<title>MFI progress report</title>
+<link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22MFI%20Daily%20Progress%20Report%22%2C%22short_name%22%3A%22MFI%20Report%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23f5f5f2%22%2C%22theme_color%22%3A%22%230f6e56%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%253D%2527http%253A%252F%252Fwww.w3.org%252F2000%252Fsvg%2527%2520viewBox%253D%25270%25200%2520192%2520192%2527%253E%253Crect%2520width%253D%2527192%2527%2520height%253D%2527192%2527%2520rx%253D%252732%2527%2520fill%253D%2527%25230f6e56%2527%252F%253E%253Ctext%2520x%253D%252796%2527%2520y%253D%2527112%2527%2520font-size%253D%252764%2527%2520font-family%253D%2527sans-serif%2527%2520fill%253D%2527white%2527%2520text-anchor%253D%2527middle%2527%253EMFI%253C%252Ftext%253E%253C%252Fsvg%253E%22%2C%22sizes%22%3A%22192x192%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<style>
+:root{
+  --bg:#f5f5f2;--card:#fff;--text:#1a1a18;--sub:#5c5b56;--line:#d8d6cf;
+  --accent:#0f6e56;--accent-text:#fff;--danger:#a32d2d;--ro:#eceae2;
+  box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){--bg:#17171a;--card:#232326;--text:#eceae2;--sub:#a6a49c;--line:#3a3a3c;--accent:#5dcaa5;--accent-text:#04342c;--ro:#2c2c2f;}
+}
+:root[data-theme="dark"]{--bg:#17171a;--card:#232326;--text:#eceae2;--sub:#a6a49c;--line:#3a3a3c;--accent:#5dcaa5;--accent-text:#04342c;--ro:#2c2c2f;}
+html{scroll-padding-top:env(safe-area-inset-top,0px);}
+*{box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,Segoe UI,sans-serif;margin:0;padding:16px;max-width:760px;margin:0 auto;line-height:1.5;}
+h1{font-size:19px;font-weight:500;margin:8px 0 4px;}
+h2{font-size:15px;font-weight:500;margin:0 0 10px;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:12px 0;}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.grid4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px;}
+label{font-size:12px;color:var(--sub);display:block;margin-bottom:2px;}
+input,select,textarea{width:100%;padding:7px 8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--text);font-size:13px;margin-bottom:8px;font-family:inherit;}
+input[readonly]{background:var(--ro);color:var(--sub);}
+textarea{resize:vertical;min-height:38px;}
+.row{display:flex;gap:8px;align-items:center;justify-content:space-between;}
+button{padding:8px 14px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--text);font-size:13px;cursor:pointer;}
+button.primary{background:var(--accent);color:var(--accent-text);border:none;font-weight:500;}
+button.danger{color:var(--danger);border-color:var(--danger);background:transparent;}
+.blockhead{font-weight:500;font-size:14px;margin-bottom:8px;}
+pre{white-space:pre-wrap;font-family:ui-monospace,monospace;font-size:12.5px;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:12px;overflow-x:auto;}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;}
+.small{font-size:11px;color:var(--sub);margin:2px 0 8px;}
+.pointrow{display:flex;gap:6px;align-items:center;}
+.pointrow input{margin-bottom:6px;}
+.pointrow button{padding:4px 9px;flex:none;}
+.kmrow,.wtrow{border:1px dashed var(--line);border-radius:8px;padding:8px;margin-bottom:8px;position:relative;}
+.kmrow .rm,.wtrow .rm{position:absolute;top:6px;right:6px;padding:2px 8px;}
+.wtrow .grid{padding-right:34px;}
+</style>
+
+<h1>Daily progress report — track machine</h1>
+<p class="small">Fill in the header and each block working. Fields that follow a fixed rule are calculated for you automatically.</p>
+
+<div class="card">
+  <h2>Header</h2>
+  <div class="grid">
+    <div><label>MFI number</label><input id="mfi" value="56973"></div>
+    <div><label>Division</label>
+      <select id="division">
+        <option value="MAS">Chennai (MAS)</option>
+        <option value="MDU">Madurai (MDU)</option>
+        <option value="PGT">Palakkad (PGT)</option>
+        <option value="SA">Salem (SA)</option>
+        <option value="TVC">Thiruvananthapuram (TVC)</option>
+        <option value="TPJ" selected>Tiruchchirappalli (TPJ)</option>
+      </select>
+    </div>
+    <div><label>Working Division</label>
+      <select id="workingDivision">
+        <option value="" selected>None</option>
+        <option value="MAS">Chennai (MAS)</option>
+        <option value="MDU">Madurai (MDU)</option>
+        <option value="PGT">Palakkad (PGT)</option>
+        <option value="SA">Salem (SA)</option>
+        <option value="TVC">Thiruvananthapuram (TVC)</option>
+        <option value="TPJ">Tiruchchirappalli (TPJ)</option>
+      </select>
+    </div>
+    <div><label>Date</label><input id="date" type="date"></div>
+    <div><label>M/c ready time</label><input id="readyTime" type="time"></div>
+  </div>
+  <label>M/c ready location</label><input id="readyLoc" placeholder="e.g. VM" oninput="this.value=this.value.toUpperCase()">
+</div>
+
+<div id="blocks"></div>
+
+<div class="row">
+  <button onclick="addBlock()">+ Add block working</button>
+</div>
+
+<div class="card">
+  <h2>Stabling &amp; overall remarks</h2>
+  <label>M/C stabled at</label><input id="stabledLoc" placeholder="e.g. VM" oninput="this.value=this.value.toUpperCase()">
+  <label>Overall remarks</label><textarea id="overallRemarks" placeholder="e.g. Due point"></textarea>
+</div>
+
+<div class="actions">
+  <button class="primary" onclick="generate()">Generate report</button>
+  <button onclick="copyReport()">Copy</button>
+  <button onclick="downloadReport()">Download .txt</button>
+</div>
+
+<pre id="output" style="display:none"></pre>
+
+<script>
+let blockCount = 0;
+
+(function setTodayDate(){
+  const d = new Date();
+  document.getElementById('date').value = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+})();
+
+function kmRowHTML(){
+  return `<div class="kmrow">
+    <button type="button" class="danger rm" onclick="removeKmRow(this)">×</button>
+    <div class="grid4">
+      <div><label>From KM</label><input type="text" inputmode="numeric" maxlength="3" class="k-fromnum" oninput="kmDigits(this,'k-fromm',false)"></div>
+      <div><label>From metre</label><input type="text" inputmode="numeric" maxlength="3" class="k-fromm" oninput="kmDigits(this,'k-tonum',false)"></div>
+      <div><label>To KM</label><input type="text" inputmode="numeric" maxlength="3" class="k-tonum" oninput="kmDigits(this,'k-tom',true)"></div>
+      <div><label>To metre</label><input type="text" inputmode="numeric" maxlength="3" class="k-tom" oninput="kmDigits(this,'k-type',true)"></div>
+    </div>
+    <div class="grid">
+      <div><label>Type</label>
+        <select class="k-type" onchange="kmTypeChange(this)">
+          <option value="SS" selected>Single Squeeze (SS)</option>
+          <option value="DS">Double Squeeze (DS)</option>
+        </select>
+      </div>
+      <div><label>Total Meters (auto)</label><input type="text" class="k-worked" readonly></div>
+    </div>
+    <div class="small k-err" style="color:var(--danger);display:none"></div>
+  </div>`;
+}
+
+function wtRowHTML(id, first){
+  return `<div class="wtrow">
+    ${first ? '' : `<button type="button" class="danger rm" onclick="removeWtRow(this)">×</button>`}
+    <div class="grid">
+      <div><label class="w-lab-start">Working start</label>
+        ${first
+          ? `<input type="text" class="w-start" readonly>`
+          : `<input type="time" class="w-start" oninput="recomputeDependents(${id})">`}
+      </div>
+      <div><label class="w-lab-end">Working end</label><input type="time" class="w-end" oninput="recomputeDependents(${id})"></div>
+    </div>
+  </div>`;
+}
+
+function addBlock(){
+  blockCount++;
+  const id = blockCount;
+  const div = document.createElement('div');
+  div.className = 'card';
+  div.id = 'block-' + id;
+  div.innerHTML = `
+    <div class="row"><div class="blockhead">Block working BT${id}</div>
+      <button class="danger" onclick="document.getElementById('block-${id}').remove()">Remove</button></div>
+
+    <div class="grid">
+      <div><label>Block start</label><input type="time" class="f-bstart" oninput="onBstartInput(${id})"></div>
+      <div><label>Block end (min 2 hrs, extend if needed)</label><input type="time" class="f-bend" oninput="recomputeDependents(${id})"></div>
+      <div><label>Memo received</label><input type="time" class="f-memo" oninput="recomputeDependents(${id})"></div>
+      <div><label>Spot time</label><input type="time" class="f-spot" oninput="recomputeDependents(${id})"></div>
+      <div><label>Setting start (= spot time)</label><input type="text" class="f-setstart" readonly></div>
+      <div><label>Setting end</label><input type="time" class="f-setend" oninput="recomputeDependents(${id})"></div>
+    </div>
+    <div class="small f-bend-err" style="color:var(--danger);display:none">Block end must be at least 2 hours after block start — fix this before entering memo received</div>
+
+    <label style="margin-top:6px">Working times (first WT starts when setting ends; add more if work resumes after a break)</label>
+    <div class="wtlist" id="wtlist-${id}">${wtRowHTML(id, true)}</div>
+    <button type="button" onclick="addWtRow(${id})">+ Add working time</button>
+
+    <div class="grid" style="margin-top:10px">
+      <div><label>Closing start (= last working end)</label><input type="text" class="f-clstart" readonly></div>
+      <div><label>Closing end</label><input type="time" class="f-clend" oninput="recomputeDependents(${id})"></div>
+      <div><label>Section cleared time (= block end)</label><input type="text" class="f-clearedtime" readonly></div>
+      <div><label>Section cleared at (location)</label><input class="f-clearedloc" oninput="this.value=this.value.toUpperCase()"></div>
+    </div>
+
+    <label>Points worked this block (each point = 1.0 unit progress)</label>
+    <div class="points" id="points-${id}">
+      <div class="pointrow"><input class="f-point-item" placeholder="e.g. 149B" oninput="recomputeDependents(${id})"><button type="button" onclick="this.parentElement.remove();recomputeDependents(${id})">×</button></div>
+    </div>
+    <button type="button" onclick="addPoint(${id})">+ Add point</button>
+
+    <label style="margin-top:10px">Chainage / km location(s)</label>
+    <div class="small f-km-note" style="display:none;color:var(--accent)">Time loss entered, so To KM / To metre are not auto-generated. Fill them manually.</div>
+    <div class="kmlocs" id="kmlocs-${id}">${kmRowHTML()}</div>
+    <button type="button" onclick="addKmLoc(${id})">+ Add km location</button>
+
+    <div class="grid" style="margin-top:10px">
+      <div><label>Section (e.g. VM yard)</label><input class="f-section" oninput="this.value=this.value.toUpperCase()"></div>
+    </div>
+
+    <div class="grid">
+      <div><label>OHE time loss</label><input class="f-ohe" value="0" oninput="recomputeDependents(${id})"></div>
+      <div><label>P.Way time loss</label><input class="f-pway" value="0" oninput="recomputeDependents(${id})"></div>
+      <div><label>Machine failure time loss</label><input class="f-mfail" value="0" oninput="recomputeDependents(${id})"></div>
+      <div><label>S &amp; T time loss</label><input class="f-st" value="0" oninput="recomputeDependents(${id})"></div>
+      <div><label>Operating time loss (auto: block start → memo)</label><input type="text" class="f-oper" readonly></div>
+      <div><label>Shunting/Shifting time loss (auto)</label><input type="text" class="f-shunt" readonly></div>
+      <div><label>Setting and closing (auto)</label><input type="text" class="f-setclose" readonly></div>
+      <div><label>Effective Working Time (auto, all working times less losses)</label><input type="text" class="f-ewt" readonly></div>
+    </div>
+    <div class="small f-capacity" style="margin-top:4px"></div>
+
+    <label>Remarks (optional, # is added automatically in the report)</label>
+    <textarea class="f-remarks" placeholder="e.g. stretcher bars removed but rod not removed"></textarea>
+  `;
+  document.getElementById('blocks').appendChild(div);
+  recomputeDependents(id);
+}
+addBlock();
+
+function addPoint(id){
+  const wrap = document.getElementById('points-' + id);
+  const row = document.createElement('div');
+  row.className = 'pointrow';
+  row.innerHTML = `<input class="f-point-item" placeholder="e.g. 144A" oninput="recomputeDependents(${id})"><button type="button" onclick="this.parentElement.remove();recomputeDependents(${id})">×</button>`;
+  wrap.appendChild(row);
+  recomputeDependents(id);
+}
+
+function getBlockId(el){
+  const card = el.closest('[id^="block-"]');
+  return card ? card.id.split('-')[1] : null;
+}
+
+function addKmLoc(id){
+  const wrap = document.getElementById('kmlocs-' + id);
+  const div = document.createElement('div');
+  div.innerHTML = kmRowHTML();
+  wrap.appendChild(div.firstElementChild);
+  recomputeDependents(id);
+}
+
+function removeKmRow(btn){
+  const id = getBlockId(btn);
+  btn.closest('.kmrow').remove();
+  if(id) recomputeDependents(id);
+}
+
+function addWtRow(id){
+  const wrap = document.getElementById('wtlist-' + id);
+  const div = document.createElement('div');
+  div.innerHTML = wtRowHTML(id, false);
+  wrap.appendChild(div.firstElementChild);
+  recomputeDependents(id);
+}
+
+function removeWtRow(btn){
+  const id = getBlockId(btn);
+  btn.closest('.wtrow').remove();
+  if(id) recomputeDependents(id);
+}
+
+function computeKmWorked(row){
+  const fromKM = parseFloat(row.querySelector('.k-fromnum').value);
+  const fromM = parseFloat(row.querySelector('.k-fromm').value);
+  const toKM = parseFloat(row.querySelector('.k-tonum').value);
+  const toM = parseFloat(row.querySelector('.k-tom').value);
+  const type = row.querySelector('.k-type').value;
+  let worked = '';
+  if(!isNaN(fromM) && !isNaN(toM)){
+    let raw = ((isNaN(toKM)?0:toKM) - (isNaN(fromKM)?0:fromKM))*1000 + (toM-fromM);
+    if(type === 'DS') raw = raw*2;
+    worked = Math.abs(raw)+' mtrs';
+  }
+  row.querySelector('.k-worked').value = worked;
+}
+
+function updateKmRow(el){
+  const row = el.closest('.kmrow');
+  computeKmWorked(row);
+  const id = getBlockId(row);
+  if(id) recomputeDependents(id);
+}
+
+// Choosing SS/DS re-generates To KM / To metre: DS needs half the chainage of SS for the same Total Meters
+function kmTypeChange(el){
+  const row = el.closest('.kmrow');
+  row.dataset.toManual = '';
+  updateKmRow(el);
+}
+
+// Keeps only digits (max 3), jumps to the next box once 3 digits are typed.
+// Typing in a To box marks the row as manually set, so auto-fill stops overwriting it.
+function kmDigits(el, nextCls, isTo){
+  el.value = el.value.replace(/\D/g,'').slice(0,3);
+  const row = el.closest('.kmrow');
+  if(isTo){
+    const hasTo = row.querySelector('.k-tonum').value !== '' || row.querySelector('.k-tom').value !== '';
+    row.dataset.toManual = hasTo ? '1' : '';
+  }
+  updateKmRow(el);
+  if(el.value.length === 3 && nextCls){
+    const next = row.querySelector('.' + nextCls);
+    if(next){ next.focus(); if(next.select) next.select(); }
+  }
+}
+
+function addMinutes(time, mins){
+  if(!time) return '';
+  const [h,m] = time.split(':').map(Number);
+  let total = h*60+m+mins;
+  total = ((total % 1440) + 1440) % 1440;
+  const hh = Math.floor(total/60), mm = total%60;
+  return String(hh).padStart(2,'0')+':'+String(mm).padStart(2,'0');
+}
+function diffMinutes(start,end){
+  if(!start||!end) return null;
+  const [sh,sm]=start.split(':').map(Number), [eh,em]=end.split(':').map(Number);
+  let d=(eh*60+em)-(sh*60+sm);
+  if(d<0) d+=1440;
+  return d;
+}
+function fmtDur(mins){
+  if(mins==null) return '--';
+  const h=Math.floor(mins/60), m=mins%60;
+  return String(h).padStart(2,'0')+' hour '+String(m).padStart(2,'0')+' mins';
+}
+function formatDateDMY(iso){
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${d}/${m}/${y}`;
+}
+function fmtLoss(v){
+  return (parseFloat(v)||0) + ' mins';
+}
+function hashRemark(text){
+  const t = (text||'').trim().replace(/^#+\s*/, '');
+  return t ? '# ' + t : '';
+}
+
+// Returns [{start,end}] for every working time row in a block
+function getWorkingTimes(b){
+  return [...b.querySelectorAll('.wtrow')].map(r=>({
+    start: r.querySelector('.w-start').value,
+    end: r.querySelector('.w-end').value
+  }));
+}
+function sumWorkingMinutes(wts){
+  let total = 0, any = false;
+  wts.forEach(w=>{
+    const d = diffMinutes(w.start, w.end);
+    if(d!=null){ total += d; any = true; }
+  });
+  return any ? total : null;
+}
+
+// Minutes between the end of one working time and the start of the next (counted as shunting loss)
+function gapBetweenWorkingTimes(wts){
+  let total = 0, any = false;
+  for(let i=0;i<wts.length-1;i++){
+    const d = diffMinutes(wts[i].end, wts[i+1].start);
+    if(d!=null){ total += d; any = true; }
+  }
+  return any ? total : null;
+}
+
+function onBstartInput(id){
+  const b = document.getElementById('block-' + id);
+  const bstart = b.querySelector('.f-bstart').value;
+  b.querySelector('.f-bend').value = bstart ? addMinutes(bstart,120) : '';
+  recomputeDependents(id);
+}
+
+function recomputeDependents(id){
+  const b = document.getElementById('block-' + id);
+  if(!b) return;
+  const bstart = b.querySelector('.f-bstart').value;
+  const bend = b.querySelector('.f-bend').value;
+  const memo = b.querySelector('.f-memo').value;
+  const spot = b.querySelector('.f-spot').value;
+  const setend = b.querySelector('.f-setend').value;
+  const clend = b.querySelector('.f-clend').value;
+
+  b.querySelector('.f-clearedtime').value = bend;
+
+  const dur = diffMinutes(bstart, bend);
+  const errBox = b.querySelector('.f-bend-err');
+  const memoField = b.querySelector('.f-memo');
+  if(bstart && bend && dur!=null && dur<120){
+    errBox.style.display = 'block';
+    memoField.disabled = true;
+    memoField.value = '';
+  } else {
+    errBox.style.display = 'none';
+    memoField.disabled = false;
+  }
+
+  const setstart = spot || '';
+  b.querySelector('.f-setstart').value = setstart;
+
+  // Working time rows: label numbering, first row start = setting end
+  const wtRows = [...b.querySelectorAll('.wtrow')];
+  wtRows.forEach((r,i)=>{
+    r.querySelector('.w-lab-start').textContent = `Working (WT${i+1}) start` + (i===0 ? ' (= setting end)' : '');
+    r.querySelector('.w-lab-end').textContent = `Working (WT${i+1}) end`;
+  });
+  if(wtRows.length) wtRows[0].querySelector('.w-start').value = setend || '';
+
+  const wts = getWorkingTimes(b);
+  const lastWithEnd = [...wts].reverse().find(w=>w.end);
+  const clstart = lastWithEnd ? lastWithEnd.end : '';
+  b.querySelector('.f-clstart').value = clstart;
+
+  // Chainage limit: km location N is limited by working time N (every 10 mins = 100 mtrs of chainage)
+  const lossTyped = ['.f-ohe','.f-pway','.f-mfail','.f-st'].some(c => (parseFloat(b.querySelector(c).value)||0) > 0);
+  b.querySelector('.f-km-note').style.display = lossTyped ? 'block' : 'none';
+  [...b.querySelectorAll('.kmrow')].forEach((row,i)=>{
+    const err = row.querySelector('.k-err');
+
+    // Auto-generate To KM / To metre from the From values and working time N (100 mtrs per 10 mins)
+    if(row.dataset.toManual !== '1'){
+      const fK = parseInt(row.querySelector('.k-fromnum').value, 10);
+      const fM = parseInt(row.querySelector('.k-fromm').value, 10);
+      const wN = wts[i];
+      const mN = wN ? diffMinutes(wN.start, wN.end) : null;
+      if(!isNaN(fK) && !isNaN(fM) && mN!=null && mN>0 && !lossTyped){
+        const isDS = row.querySelector('.k-type').value === 'DS';
+        const endPos = fK*1000 + fM + (isDS ? mN*5 : mN*10);
+        row.querySelector('.k-tonum').value = String(Math.floor(endPos/1000)).padStart(3,'0');
+        row.querySelector('.k-tom').value = String(endPos%1000).padStart(3,'0');
+      } else {
+        row.querySelector('.k-tonum').value = '';
+        row.querySelector('.k-tom').value = '';
+      }
+    } else {
+      // To typed by hand: pick SS or DS so Total Meters matches the working time (100 mtrs per 10 mins)
+      const fK = parseInt(row.querySelector('.k-fromnum').value, 10);
+      const fM = parseInt(row.querySelector('.k-fromm').value, 10);
+      const tK = parseInt(row.querySelector('.k-tonum').value, 10);
+      const tM = parseInt(row.querySelector('.k-tom').value, 10);
+      const wN = wts[i];
+      const mN = wN ? diffMinutes(wN.start, wN.end) : null;
+      if(!isNaN(fK) && !isNaN(fM) && !isNaN(tK) && !isNaN(tM) && row.querySelector('.k-tom').value.length === 3 && mN!=null && mN>0){
+        const span = Math.abs((tK-fK)*1000 + (tM-fM));
+        const target = mN*10;
+        if(span*2 === target) row.querySelector('.k-type').value = 'DS';
+        else if(span === target) row.querySelector('.k-type').value = 'SS';
+      }
+    }
+    computeKmWorked(row);
+
+    const fromKM = parseFloat(row.querySelector('.k-fromnum').value);
+    const fromM = parseFloat(row.querySelector('.k-fromm').value);
+    const toKM = parseFloat(row.querySelector('.k-tonum').value);
+    const toM = parseFloat(row.querySelector('.k-tom').value);
+    const w = wts[i];
+    const wtMins = w ? diffMinutes(w.start, w.end) : null;
+    let msg = '';
+    if(wtMins!=null && !isNaN(fromM) && !isNaN(toM)){
+      const span = Math.abs(((isNaN(toKM)?0:toKM)-(isNaN(fromKM)?0:fromKM))*1000 + (toM-fromM));
+      const maxSpan = wtMins*10;
+      if(span > maxSpan) msg = `WT${i+1} is ${wtMins} mins, so To can be at most ${maxSpan} mtrs from From (100 mtrs per 10 mins). Entered: ${span} mtrs`;
+    }
+    row.dataset.invalid = msg ? '1' : '';
+    err.textContent = msg;
+    err.style.display = msg ? 'block' : 'none';
+  });
+
+  const operMins = diffMinutes(bstart, memo);
+  b.querySelector('.f-oper').value = operMins!=null ? operMins+' mins' : '';
+
+  const shunt1 = diffMinutes(memo, spot);
+  const shunt2 = diffMinutes(clend, bend);
+  const shunt3 = gapBetweenWorkingTimes(wts);
+  let shuntTotal = null;
+  if(shunt1!=null || shunt2!=null || shunt3!=null) shuntTotal = (shunt1||0) + (shunt2||0) + (shunt3||0);
+  b.querySelector('.f-shunt').value = shuntTotal!=null ? shuntTotal+' mins' : '';
+
+  const sc1 = diffMinutes(setstart, setend);
+  const sc2 = diffMinutes(clstart, clend);
+  let scTotal = null;
+  if(sc1!=null || sc2!=null) scTotal = (sc1||0) + (sc2||0);
+  b.querySelector('.f-setclose').value = scTotal!=null ? scTotal+' mins' : '';
+
+  const ohe = parseFloat(b.querySelector('.f-ohe').value)||0;
+  const pway = parseFloat(b.querySelector('.f-pway').value)||0;
+  const mfail = parseFloat(b.querySelector('.f-mfail').value)||0;
+  const st = parseFloat(b.querySelector('.f-st').value)||0;
+  const ewtRaw = sumWorkingMinutes(wts);
+  const lossSum = ohe+pway+mfail+st;
+  const ewt = ewtRaw!=null ? Math.max(ewtRaw - lossSum, 0) : null;
+  b.querySelector('.f-ewt').value = ewt!=null ? fmtDur(ewt) : '';
+
+  const pointsCount = [...b.querySelectorAll('.f-point-item')].filter(p=>p.value.trim()!=='').length;
+  const timeForPoints = pointsCount*60;
+  const remaining = ewt!=null ? ewt - timeForPoints : null;
+  const maxMetersAvail = remaining!=null ? Math.max(remaining*10, 0) : null;
+  const maxMetersNoPoints = ewt!=null ? ewt*10 : null;
+  const actualMetres = [...b.querySelectorAll('.k-worked')].reduce((s,el)=>s+(parseFloat(el.value)||0), 0);
+
+  const capBox = b.querySelector('.f-capacity');
+  if(ewt!=null){
+    let capText = `At 60 min/point and 600 mtrs per 60 min: with ${ewt} min effective time, capacity is ${pointsCount} point(s) (uses ${timeForPoints} min) + up to ${Math.round(maxMetersAvail)} mtrs — or up to ${Math.round(maxMetersNoPoints)} mtrs if no points are worked`;
+    if(timeForPoints > ewt){
+      capText += ' ⚠ Points entered need more time than the effective time available';
+      capBox.style.color = 'var(--danger)';
+    } else if(actualMetres > maxMetersAvail + 0.01){
+      capText += ' ⚠ Metres entered exceed what the remaining time allows';
+      capBox.style.color = 'var(--danger)';
+    } else {
+      capBox.style.color = 'var(--sub)';
+    }
+    capBox.textContent = capText;
+  } else {
+    capBox.textContent = '';
+  }
+}
+
+function val(el,cls){ const e = el.querySelector('.'+cls); return e ? e.value.trim() : ''; }
+
+function generate(){
+  const badRows = [...document.querySelectorAll('.kmrow')].filter(r=>r.dataset.invalid==='1');
+  if(badRows.length){
+    const pre0 = document.getElementById('output');
+    pre0.textContent = 'Cannot generate the report yet: a km location is longer than its working time allows. Fix the red messages in the block(s) and try again.';
+    pre0.style.display = 'block';
+    return;
+  }
+  const mfi=document.getElementById('mfi').value;
+  const division=document.getElementById('division').value;
+  const workingDivision=document.getElementById('workingDivision').value;
+  const date=formatDateDMY(document.getElementById('date').value);
+  const readyTime=document.getElementById('readyTime').value;
+  const readyLoc=document.getElementById('readyLoc').value;
+
+  let out = `Progress of MFI ${mfi}\n${division} division\n${workingDivision ? 'Working Division: '+workingDivision+'\n' : ''}Date ${date}\nM/c ready by ${readyTime} hrs @ ${readyLoc}\n`;
+
+  const blockDivs = [...document.getElementById('blocks').children];
+  let totalUnits=0, totalMetres=0, totalEwt=0;
+
+  blockDivs.forEach((b,i)=>{
+    const n=i+1;
+    const bstart=val(b,'f-bstart');
+    const bend=val(b,'f-bend');
+    const memo=val(b,'f-memo'), spot=val(b,'f-spot');
+    const setstart=b.querySelector('.f-setstart').value, setend=val(b,'f-setend');
+    const clstart=b.querySelector('.f-clstart').value, clend=val(b,'f-clend');
+    const clearedtime=b.querySelector('.f-clearedtime').value, clearedloc=val(b,'f-clearedloc');
+
+    const wts = getWorkingTimes(b);
+    const wtLines = wts.map((w,k)=>`WT${k+1} :${w.start}-${w.end}hrs`).join('\n');
+
+    const points = [...b.querySelectorAll('.f-point-item')].map(p=>p.value.trim()).filter(Boolean);
+    const units = points.length * 1.0;
+
+    const kmRows = [...b.querySelectorAll('.kmrow')].filter(row=>row.querySelector('.k-fromm').value !== '' && row.querySelector('.k-tom').value !== '');
+    const kmLines = kmRows.map(row=>{
+      const fromKM=row.querySelector('.k-fromnum').value, fromM=row.querySelector('.k-fromm').value;
+      const toKM=row.querySelector('.k-tonum').value, toM=row.querySelector('.k-tom').value;
+      const type=row.querySelector('.k-type').value, worked=row.querySelector('.k-worked').value;
+      const chainStr = (!toKM || fromKM===toKM) ? `${fromKM}/${fromM}-${toM}` : `${fromKM}/${fromM}-${toKM}/${toM}`;
+      return `${chainStr} ${type} (Total Meters: ${worked})`;
+    }).join('\n');
+
+    const kmMetresSum = kmRows.reduce((s,row)=>s + (parseFloat(row.querySelector('.k-worked').value)||0), 0);
+
+    const metres=kmMetresSum;
+    const section=val(b,'f-section');
+    const ohe=val(b,'f-ohe'), pway=val(b,'f-pway'), mfail=val(b,'f-mfail'), st=val(b,'f-st');
+    const oper=b.querySelector('.f-oper').value;
+    const shunt=b.querySelector('.f-shunt').value;
+    const setclose=b.querySelector('.f-setclose').value;
+    const remarks=hashRemark(val(b,'f-remarks'));
+
+    const ewtRaw = sumWorkingMinutes(wts);
+    const lossMins = (parseFloat(ohe)||0) + (parseFloat(pway)||0) + (parseFloat(mfail)||0) + (parseFloat(st)||0);
+    const ewtMins = ewtRaw!=null ? Math.max(ewtRaw - lossMins, 0) : null;
+    if(ewtMins!=null) totalEwt += ewtMins;
+    totalUnits += units; totalMetres += metres;
+
+    const progressParts = [];
+    if(units>0) progressParts.push(`${units.toFixed(1)} unit`);
+    if(metres>0) progressParts.push(`${metres} mtrs`);
+    const progressLine = progressParts.length ? progressParts.join(' ') : '--';
+
+    const pointsStr = points.map(p=>'#'+p).join('\n');
+    const pkLines = [];
+    if(pointsStr) pkLines.push(pointsStr);
+    if(kmLines) pkLines.push(kmLines);
+    const pkSection = pkLines.length ? pkLines.join('\n') : '--';
+
+    out += `\n${n}) BT${n} : ${bstart}-${bend}hrs\nMemo received: ${memo} hrs\nSpot: ${spot}hrs\n\nSetting: ${setstart}-${setend} hrs\n${wtLines}\nClosing: ${clstart}-${clend} hrs\n\nPoint/KM:\n${pkSection}\n\nProgress: ${progressLine}\nSection: ${section}\n\nEWT : ${fmtDur(ewtMins)}\nSection cleared at ${clearedtime} hrs at ${clearedloc}\n\n1) OHE time loss : ${fmtLoss(ohe)}\n2) P.Way time loss : ${fmtLoss(pway)}\n3) Machine failure time loss : ${fmtLoss(mfail)}\n4) S & T time loss : ${fmtLoss(st)}\n5) Operating time loss : ${oper}\n6) Shunting/Shifting time loss : ${shunt}\n7) Setting and closing : ${setclose}\n`;
+    if(remarks) out += remarks + '\n';
+  });
+
+  const totalParts = [];
+  if(totalUnits>0) totalParts.push(`${totalUnits.toFixed(1)} unit`);
+  if(totalMetres>0) totalParts.push(`${totalMetres} mtrs`);
+  const totalProgressLine = totalParts.length ? totalParts.join(' ') : '--';
+
+  const overall = hashRemark(document.getElementById('overallRemarks').value);
+
+  out += `\nTotal progress: ${totalProgressLine}\nTotal hours : ${fmtDur(totalEwt)}\n\n#M/C Stabled at ${document.getElementById('stabledLoc').value}\n`;
+  if(overall) out += `\nRemarks:\n${overall}`;
+
+  const pre = document.getElementById('output');
+  pre.textContent = out;
+  pre.style.display = 'block';
+}
+
+function fallbackCopy(t){
+  const ta = document.createElement('textarea');
+  ta.value = t; ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  ta.remove();
+}
+function copyText(t){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(t).catch(()=>fallbackCopy(t));
+  } else { fallbackCopy(t); }
+}
+function copyReport(){
+  const pre = document.getElementById('output');
+  if(pre.style.display==='none'){ generate(); }
+  copyText(pre.textContent);
+}
+function downloadReport(){
+  const pre = document.getElementById('output');
+  if(pre.style.display==='none'){ generate(); }
+  const blob = new Blob([pre.textContent], {type:'text/plain'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'mfi-progress-report.txt';
+  a.click();
+}
+</script>
